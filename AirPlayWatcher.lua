@@ -64,7 +64,7 @@ function AirPlayWatcher:start()
 
   self.audiodeviceSubscription = Observables.audiodevice.create()
     :filter(function(t) return t == "dOut" end)
-    :filter(function(t) return audiodevice.defaultOutputDevice():name() == "AirPlay" end)
+    :filter(function(t) return audiodevice.defaultOutputDevice():transportType() == "AirPlay" end)
     :subscribe(function(type)
         self.audioSubject:onNext("audio")
     end)
