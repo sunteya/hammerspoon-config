@@ -1,0 +1,6 @@
+[submodule "modules/RxLua"]
+	path = modules/RxLua
+	url = https://github.com/bjornbytes/RxLua.git
+[submodule "modules/hs.tiling"]
+	path = modules/hs.tiling
+	url = https://github.com/dsanson/hs.tiling.git
