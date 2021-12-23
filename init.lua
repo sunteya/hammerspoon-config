@@ -34,11 +34,11 @@ caffeinate.watcher.new(function(event)
   end
 end):start()
 
-caffeinate.watcher.new(function(event)
-  if event == caffeinate.watcher.systemDidWake then
-    hs.execute("ps aux | grep Jitouch | grep -v grep | awk '{print $2}' | xargs kill && open ~/Library/PreferencePanes/Jitouch.prefPane/Contents/Resources/Jitouch.app", true)
-  end
-end):start()
+-- caffeinate.watcher.new(function(event)
+--   if event == caffeinate.watcher.systemDidWake then
+--     hs.execute("ps aux | grep Jitouch | grep -v grep | awk '{print $2}' | xargs kill && open ~/Library/PreferencePanes/Jitouch.prefPane/Contents/Resources/Jitouch.app", true)
+--   end
+-- end):start()
 
 -- caffeinate.watcher.new(function(event)
 --   if event == caffeinate.watcher.screensaverDidStart then
@@ -78,15 +78,91 @@ hs.pathwatcher.new(os.getenv("HOME") .. "/.hammerspoon/", reload_config):start()
 hs.alert.show("Config loaded")
 
 
+
+-- -----------------------------------------------
+-- -- TEMPORARY!! Capslock is Hyper Key
+-- -----------------------------------------------
+-- local globals = {}
+
+-- hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, function(event)
+--   -- print("key = ", event:getKeyCode())
+--   -- print('flagsChanged!', hs.inspect(event))
+
+--   if event:getFlags().fn then
+--     globals.hypered = true
+--   else
+--     globals.hypered = false
+--   end
+
+--   return false
+-- end):start()
+
+-- hs.eventtap.new({ hs.eventtap.event.types.keyUp }, function(event)
+--   if event:getKeyCode() == 179 then
+--     if hs.keycodes.currentSourceID() == "com.apple.keylayout.US" then
+--       hs.keycodes.currentSourceID("im.rime.inputmethod.Squirrel.Rime")
+--     else
+--       hs.keycodes.currentSourceID("com.apple.keylayout.US")
+--     end
+--   end
+-- end):start()
+
+-- hs.eventtap.new({ hs.eventtap.event.types.keyDown }, function(event)
+--   if globals.hypered then
+--     if event:getKeyCode() == hs.keycodes.map["b"] then
+--       positionWindowLikeBrowser()
+--       return true
+--     elseif event:getKeyCode() == hs.keycodes.map["e"] then
+--       positionWindowLikeExplorer()
+--       return true
+--     end
+--   end
+-- end):start()
+
+-- hs.eventtap.keyStroke({}, "ESCAPE")
+
+-- xyzzy = hs.hotkey.bind({}, "j",
+--     function()
+--       print(hs.eventtap.checkKeyboardModifiers())
+--         if hs.eventtap.checkKeyboardModifiers().fn then
+--           print("FN is DOWN!!!")
+--         else
+--             xyzzy:disable()
+--             hs.eventtap.keyStroke({}, "j")
+--             xyzzy:enable()
+--         end
+--     end
+-- )
+
+
+local hyper = {"⌘", "⌥", "⌃", "⇧"}
+
+
+-----------------------------------------------
+-- Device manager
+-----------------------------------------------
+hotkey.bind(hyper, "m", function()
+  local defaultDevice = hs.audiodevice.defaultInputDevice()
+  if defaultDevice:inputMuted() then
+    for _, device in ipairs(hs.audiodevice.allInputDevices()) do
+      device:setInputMuted(false)
+    end
+    hs.alert.show("🎙️ On")
+  else
+    for _, device in ipairs(hs.audiodevice.allInputDevices()) do
+      device:setInputMuted(true)
+    end
+    hs.alert.show("🎙️ 🛑️️ Off")
+  end
+end)
+
 -----------------------------------------------
 -- Window manager
 -----------------------------------------------
 local window = require "hs.window"
 window.animationDuration = 0
-local hyper = {"⌘", "⌥", "⌃", "⇧"}
 
--- Center Window (Like Browser)
-hotkey.bind(hyper, "b", function()
+function positionWindowLikeBrowser()
   local win = window.focusedWindow()
   local screen = win:screen():frame()
   local frame = win:frame()
@@ -95,16 +171,22 @@ hotkey.bind(hyper, "b", function()
   frame.x = (screen.w - frame.w) / 2
   frame.y = (screen.h - frame.h) / 2 + screen.y
   win:setFrame(frame)
+end
+hotkey.bind(hyper, "b", function()
+  positionWindowLikeBrowser()
 end)
 
--- Center Window (Like Browser)
-hotkey.bind(hyper, "e", function()
+
+function positionWindowLikeExplorer()
   local win = window.focusedWindow()
   local screen = win:screen():frame()
   local frame = win:frame()
   frame.w = screen.w * 0.75
   frame.h = screen.h * 0.75
   win:setFrame(frame)
+end
+hotkey.bind(hyper, "e", function()
+  positionWindowLikeExplorer()
 end)
 
 -----------------------------------------------
@@ -270,9 +352,9 @@ end)
 -----------------------------------------------
 -- Hyper i to show window hints
 -----------------------------------------------
-hotkey.bind(hyper, "i", function()
-  hs.hints.windowHints()
-end)
+-- hotkey.bind(hyper, "i", function()
+--   hs.hints.windowHints()
+-- end)
 
 
 -- hs.hotkey.bind({"cmd"}, "f6", function()
@@ -284,6 +366,6 @@ end)
 -- end)
 -- tap:start()
 
-hotkey.bind(hyper, "t", function()
-  print("start debug")
-end)
+-- hotkey.bind(hyper, "t", function()
+--   print("start debug")
+-- end)
